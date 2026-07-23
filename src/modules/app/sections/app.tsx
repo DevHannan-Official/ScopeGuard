@@ -26,13 +26,27 @@ import {
   XCircle,
 } from "lucide-react";
 import { analyzeScopeAction } from "../actions/analyze-scope";
+import { Controller, useForm } from "react-hook-form";
+import { promptSchema, promptSchemaType } from "../lib/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { useState } from "react";
 
 const AppSection = () => {
-  const [values, setValues] = useState({
-    originalScope: "",
-    clientRequest: "",
+  const form = useForm<promptSchemaType>({
+    resolver: zodResolver(promptSchema),
+    defaultValues: {
+      originalScope: "",
+      clientRequest: "",
+    },
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const listItems = [
     {
       title: "E-commerce section with checkout flow",
@@ -67,61 +81,90 @@ const AppSection = () => {
     return { totalFrom, totalTo };
   };
 
-  async function onSubmit(values: any) {
+  async function onSubmit(values: promptSchemaType) {
+    setIsSubmitting(true);
     const result = await analyzeScopeAction(
       values.originalScope,
       values.clientRequest,
     );
+
+    setIsSubmitting(false);
 
     console.log(result);
   }
   return (
     <div className="w-full min-h-96 p-4 flex items-start justify-center bg-muted gap-6">
       <Card className="w-full max-w-xl px-6">
-        <div className="w-full flex flex-col gap-2 *:px-0">
-          <CardHeader>
-            <CardTitle>1. Original Scope</CardTitle>
-            <CardDescription>
-              Paste your agreed scope, SOW, or contract details.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              maxLength={3000}
-              placeholder={`Design a 5-page website in Figma.\nIncludes: homepage, about, services, contact, blog.\n2 rounds of revisions included.\n\nTimeline: 3 weeks.`}
-              className="min-h-46"
-              value={values.originalScope}
-              onChange={(e) =>
-                setValues({ ...values, originalScope: e.target.value })
-              }
+        <form id="form-scopes" onSubmit={form.handleSubmit(onSubmit)}>
+          <FieldGroup></FieldGroup>
+          <FieldGroup>
+            <Controller
+              name="originalScope"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-scopes-original-scope">
+                    1. Original Scope
+                  </FieldLabel>
+                  <Textarea
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    maxLength={3000}
+                    placeholder={`Design a 5-page website in Figma.\nIncludes: homepage, about, services, contact, blog.\n2 rounds of revisions included.\n\nTimeline: 3 weeks.`}
+                    className="min-h-46"
+                    id="form-scopes-original-scope"
+                  />
+                  <FieldDescription>
+                    Paste your agreed scope, SOW, or contract details.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
             />
-          </CardContent>
-        </div>
-        <div className="w-full flex flex-col gap-2 *:px-0">
-          <CardHeader>
-            <CardTitle>2. Client's New Request</CardTitle>
-            <CardDescription>
-              Paste the new request from your client.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              maxLength={3000}
-              placeholder={`Hey, can you also add an e-commerce section with product listings and a checkout flow? Also, the CEO wants a team page and a careers page.\n\nLet me know if that works!`}
-              className="min-h-46"
-              value={values.clientRequest}
-              onChange={(e) =>
-                setValues({ ...values, clientRequest: e.target.value })
-              }
+
+            <Controller
+              name="clientRequest"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-scopes-client-request">
+                    2. Client's New Request
+                  </FieldLabel>
+                  <Textarea
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    maxLength={3000}
+                    placeholder={`Hey, can you also add an e-commerce section with product listings and a checkout flow? Also, the CEO wants a team page and a careers page.\n\nLet me know if that works!`}
+                    className="min-h-46"
+                    id="form-scopes-client-request"
+                  />
+                  <FieldDescription>
+                    Paste the new request from your client.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
             />
-          </CardContent>
-        </div>
-        <Button size={"xl"} type="button" onClick={() => onSubmit(values)}>
-          <Sparkles /> Check Scope
-        </Button>
-        <CardDescription className="flex items-center gap-1.5 self-center text-center">
-          <LockKeyhole size={14} /> No signup required. Your data is not stored.
-        </CardDescription>
+          </FieldGroup>
+          <Button
+            size={"xl"}
+            type="submit"
+            form="form-scopes"
+            className={"w-full mt-4"}
+            isLoading={isSubmitting}
+            loadingText="Checking..."
+          >
+            <Sparkles /> Check Scope
+          </Button>
+          <CardDescription className="flex items-center gap-1.5 self-center text-center mt-3 text-xs justify-center">
+            <LockKeyhole size={14} /> No signup required. Your data is not
+            stored.
+          </CardDescription>
+        </form>
       </Card>
       <Card className="w-full max-w-2xl pb-0">
         <CardContent className="px-6">
@@ -227,7 +270,7 @@ const AppSection = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Button variant={"outline"} size={"lg"}>
+                  <Button variant={"outline"} size={"lg"} className={"w-full"}>
                     <Copy /> Copy Email
                   </Button>
                   <ChevronDown size={16} />
