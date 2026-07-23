@@ -60,6 +60,7 @@ function Button({
       <ButtonPrimitive
         data-slot="button"
         className={cn(buttonVariants({ variant, size, className }))}
+        disabled
         {...props}
       >
         <LoaderCircle className="animate-spin" />

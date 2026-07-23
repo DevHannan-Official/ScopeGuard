@@ -5,8 +5,6 @@ import {
   CardContent,
   CardDescription,
   CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -37,6 +35,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { useState } from "react";
+import { useScope } from "../stores/useScope";
 
 const AppSection = () => {
   const form = useForm<promptSchemaType>({
@@ -46,6 +45,7 @@ const AppSection = () => {
       clientRequest: "",
     },
   });
+  const { result, setResult } = useScope();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const listItems = [
     {
@@ -67,19 +67,6 @@ const AppSection = () => {
       to: 300,
     },
   ];
-  const getTotalRange = () => {
-    let totalFrom = 0;
-    listItems.forEach((item) => {
-      totalFrom += item.from;
-    });
-
-    let totalTo = 0;
-    listItems.forEach((item) => {
-      totalTo += item.to;
-    });
-
-    return { totalFrom, totalTo };
-  };
 
   async function onSubmit(values: promptSchemaType) {
     setIsSubmitting(true);
@@ -87,6 +74,7 @@ const AppSection = () => {
       values.originalScope,
       values.clientRequest,
     );
+    setResult(result);
 
     setIsSubmitting(false);
 
@@ -157,6 +145,7 @@ const AppSection = () => {
             className={"w-full mt-4"}
             isLoading={isSubmitting}
             loadingText="Checking..."
+            disabled={isSubmitting}
           >
             <Sparkles /> Check Scope
           </Button>
@@ -166,124 +155,155 @@ const AppSection = () => {
           </CardDescription>
         </form>
       </Card>
-      <Card className="w-full max-w-2xl pb-0">
-        <CardContent className="px-6">
-          <Tabs>
-            <TabsList className={"w-full"} variant={"line"}>
-              <TabsTrigger value={"result"}>
-                <Frame /> Analysis Result
-              </TabsTrigger>
-              <TabsTrigger value={"breakdown"}>
-                <List /> Breakdown
-              </TabsTrigger>
-              <TabsTrigger value={"summary"}>
-                <FileText /> Summary
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value={"result"} className={"py-4"}>
-              <div className="flex items-center justify-between">
-                <div className="py-2 px-3 bg-red-500/5 rounded-full border border-red-600/10 text-red-600 flex items-center gap-1.5 w-fit">
-                  <XCircle size={18} />{" "}
-                  <span className="capitalize text-base font-medium">
-                    OUT OF STOCK
-                  </span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="py-3 px-4 bg-muted w-full max-w-36 rounded-lg border  flex items-center gap-3">
-                    <ShieldCheck size={24} />
-                    <div className="flex flex-col">
-                      <span className="text-xs text-muted-foreground">
-                        Risk Level
-                      </span>
-                      <p className="text-base font-medium">High</p>
-                    </div>
+      {!!result && (
+        <Card className="w-full max-w-2xl pb-0">
+          <CardContent className="px-6">
+            <Tabs>
+              <TabsList className={"w-full"} variant={"line"}>
+                <TabsTrigger value={"result"}>
+                  <Frame /> Analysis Result
+                </TabsTrigger>
+                <TabsTrigger value={"breakdown"}>
+                  <List /> Breakdown
+                </TabsTrigger>
+                <TabsTrigger value={"summary"}>
+                  <FileText /> Summary
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value={"result"} className={"py-4"}>
+                <div className="flex items-center justify-between">
+                  <div className="py-2 px-3 bg-red-500/5 rounded-full border border-red-600/10 text-red-600 flex items-center gap-1.5 w-fit">
+                    <XCircle size={18} />{" "}
+                    <span className="capitalize text-base font-medium">
+                      {result?.verdict}
+                    </span>
                   </div>
-                  <div className="py-3 px-4 bg-muted w-full max-w-36 rounded-lg border  flex items-center gap-3">
-                    <ChartNoAxesCombined size={24} />
-                    <div className="flex flex-col">
-                      <span className="text-xs text-muted-foreground">
-                        Confidence
-                      </span>
-                      <p className="text-base font-medium">92%</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                This request includes 3 additions not covered in your original
-                scope.
-              </p>
-              <div className="flex flex-col mt-6">
-                {listItems.map((item, i) => (
-                  <div
-                    key={i}
-                    className={cn(
-                      "py-4 px-6 border-t flex items-center justify-between",
-                      i + 1 === listItems.length && "border-b",
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="size-10 rounded-lg font-semibold border text-center flex items-center justify-center">
-                        {i + 1}
-                      </span>
-                      <div>
-                        <h5 className="text-sm font-medium">{item.title}</h5>
-                        <p className="text-xs text-muted-foreground">
-                          {item.desc}
+                  <div className="flex items-center gap-4">
+                    <div className="py-3 px-4 bg-muted w-full max-w-36 rounded-lg border  flex items-center gap-3">
+                      <ShieldCheck size={24} />
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">
+                          Risk Level
+                        </span>
+                        <p className="text-base font-medium">
+                          {result?.riskLevel}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">
-                        Est. Add-on
-                      </span>
-                      <div className="px-2 py-1.5 bg-red-500/5 text-red-600 border border-red-600/10 rounded-full">
-                        ${item.from} - ${item.to}
+                    <div className="py-3 px-4 bg-muted w-full max-w-36 rounded-lg border  flex items-center gap-3">
+                      <ChartNoAxesCombined size={24} />
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">
+                          Confidence
+                        </span>
+                        <p className="text-base font-medium">
+                          {result?.confidence}%
+                        </p>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-              <div className="p-4 mt-6 flex items-center justify-around bg-red-500/5 border rounded-lg border-red-600/10">
-                <div className="flex flex-col items-center justify-center flex-1">
-                  <p className="text-xs">Estimated Total Add-on</p>
-                  <h4 className="text-lg font-semibold">
-                    ${getTotalRange().totalFrom} - ${getTotalRange().totalTo}
-                  </h4>
                 </div>
-                <Separator orientation="vertical" />
-                <div className="flex flex-col items-center justify-center flex-1">
-                  <p className="text-xs">Timeline Extension</p>
-                  <h4 className="text-lg font-semibold">+1 week</h4>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {result?.verdict === "INSIDE_SCOPE"
+                    ? `This request includes ${result?.items.length} additions that are covered in your original scope`
+                    : result?.verdict === "NEEDS_DISCUSSION"
+                      ? `This request includes ${result?.items.length} additions that needs discussion`
+                      : `This request includes ${result?.items.length} additions that are not covered in your original scope`}
+                </p>
+                <div className="flex flex-col mt-6">
+                  {result.items.map((item, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        "py-4 px-6 border-t flex items-center justify-between",
+                        i + 1 === listItems.length && "border-b",
+                      )}
+                    >
+                      <div className="flex items-center gap-6">
+                        <span className="size-10 rounded-lg font-semibold border text-center flex items-center justify-center">
+                          {i + 1}
+                        </span>
+                        <div>
+                          <h5 className="text-sm font-medium text-ellipsis max-w-96 overflow-hidden line-clamp-1">
+                            {item.title}
+                          </h5>
+                          <p className="text-xs text-muted-foreground max-w-96 text-ellipsis line-clamp-2 overflow-hidden">
+                            {item.reason}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground text-nowrap w-full">
+                          Est. Add-on
+                        </span>
+                        <div className="px-2 py-1.5 bg-red-500/5 text-red-600 w-full max-w-fit border text-nowrap border-red-600/10 rounded-full">
+                          ${item.priceMin} - ${item.priceMax}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-              <div className="mt-4 p-3 rounded-lg border bg-background flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Mail />
-                  <div className="flex flex-col">
-                    <h5 className="text-sm font-medium">
-                      Ready-to-Send Response
-                    </h5>
-                    <p className="text-xs text-muted-foreground">
-                      Professional email you can copy and sent to your client.
-                    </p>
+                <div className="p-4 mt-6 flex items-center justify-around bg-red-500/5 border rounded-lg border-red-600/10">
+                  <div className="flex flex-col items-center justify-center flex-1">
+                    <p className="text-xs">Estimated Total Add-on</p>
+                    <h4 className="text-lg font-semibold">
+                      {result?.estimatedPrice.currency}
+                      {result?.estimatedPrice.min} -{" "}
+                      {result?.estimatedPrice.currency}
+                      {result?.estimatedPrice.max}
+                    </h4>
+                  </div>
+                  <Separator orientation="vertical" />
+                  <div className="flex flex-col items-center justify-center flex-1">
+                    <p className="text-xs">Timeline Extension</p>
+                    <h4 className="text-lg font-semibold">
+                      +{result?.timelineExtension}
+                    </h4>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Button variant={"outline"} size={"lg"} className={"w-full"}>
-                    <Copy /> Copy Email
-                  </Button>
-                  <ChevronDown size={16} />
+                <div className="mt-4 py-3 px-6 rounded-lg border rounded-b-none bg-background flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Mail />
+                    <div className="flex flex-col">
+                      <h5 className="text-sm font-medium">
+                        Ready-to-Send Response
+                      </h5>
+                      <p className="text-xs text-muted-foreground">
+                        Professional email you can copy and sent to your client.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant={"outline"}
+                      size={"lg"}
+                      className={"w-full"}
+                      onClick={async (e) =>
+                        await navigator.clipboard.writeText(result?.email)
+                      }
+                    >
+                      <Copy /> Copy Email
+                    </Button>
+                    <ChevronDown size={16} />
+                  </div>
                 </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-        <CardFooter className=" flex-1 bg-muted flex items-center justify-between px-6 py-4">
-          <span className="text-muted-foreground">Generated by ScopeGuard</span>
-          <ShieldCheck size={20} />
-        </CardFooter>
-      </Card>
+                <Textarea
+                  contentEditable={false}
+                  className="min-h-46 rounded-t-none border-t-0 px-6 py-4"
+                  placeholder="Generated mail/message..."
+                  value={result?.email}
+                />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+          <CardFooter className=" flex-1 bg-muted flex items-center justify-between px-6 py-4">
+            <span className="text-muted-foreground">
+              Generated by ScopeGuard
+            </span>
+            <ShieldCheck size={20} />
+          </CardFooter>
+        </Card>
+      )}
     </div>
   );
 };
