@@ -5,7 +5,7 @@ import { Star } from "lucide-react";
 
 const HeroSection = () => {
   return (
-    <div className="w-full flex-col min-h-screen p-4 flex items-center justify-center bg-muted gap-4">
+    <div className="w-full flex-col min-h-96 p-4 flex items-center justify-center bg-muted gap-4">
       <Logo />
       <div className="flex items-center justify-between text-center flex-col mt-8">
         <h2 className="text-4xl mb-3">Your client just asked for more.</h2>
