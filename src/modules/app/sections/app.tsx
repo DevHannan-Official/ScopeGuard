@@ -5,6 +5,7 @@ import {
   CardContent,
   CardDescription,
   CardFooter,
+  CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -166,9 +167,6 @@ const AppSection = () => {
                 <TabsTrigger value={"breakdown"}>
                   <List /> Breakdown
                 </TabsTrigger>
-                <TabsTrigger value={"summary"}>
-                  <FileText /> Summary
-                </TabsTrigger>
               </TabsList>
               <TabsContent value={"result"} className={"py-4"}>
                 <div className="flex items-center justify-between">
@@ -210,17 +208,17 @@ const AppSection = () => {
                       ? `This request includes ${result?.items.length} additions that needs discussion`
                       : `This request includes ${result?.items.length} additions that are not covered in your original scope`}
                 </p>
-                <div className="flex flex-col mt-6">
+                <div className="flex flex-col mt-6 gap-2">
                   {result.items.map((item, i) => (
                     <div
                       key={i}
                       className={cn(
-                        "py-4 px-6 border-t flex items-center justify-between",
-                        i + 1 === listItems.length && "border-b",
+                        "py-4 px-6 flex items-center justify-between bg-background rounded-lg border",
+                        i > 0 && "border-t",
                       )}
                     >
                       <div className="flex items-center gap-6">
-                        <span className="size-10 rounded-lg font-semibold border text-center flex items-center justify-center">
+                        <span className="size-10 bg-background rounded-lg font-semibold border text-center flex items-center justify-center">
                           {i + 1}
                         </span>
                         <div>
@@ -293,6 +291,61 @@ const AppSection = () => {
                   placeholder="Generated mail/message..."
                   value={result?.email}
                 />
+              </TabsContent>
+              <TabsContent value={"breakdown"} className={"py-4"}>
+                <CardTitle>Add-ons</CardTitle>
+                <div className="flex flex-col mt-2 gap-2">
+                  {result.items.map((item, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        "py-4 px-6 flex items-center justify-between bg-background rounded-lg border",
+                        i + 1 === result.items.length &&
+                          "border-b-0 rounded-b-none",
+                      )}
+                    >
+                      <div className="flex items-center gap-6">
+                        <span className="size-10 rounded-lg font-semibold border text-center flex items-center justify-center">
+                          {i + 1}
+                        </span>
+                        <div>
+                          <h5 className="text-sm font-medium text-ellipsis max-w-96 overflow-hidden line-clamp-1">
+                            {item.title}
+                          </h5>
+                          <p className="text-xs text-muted-foreground max-w-96 text-ellipsis line-clamp-2 overflow-hidden">
+                            {item.reason}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground text-nowrap w-full">
+                          Est. Add-on
+                        </span>
+                        <div className="px-2 py-1.5 bg-red-500/5 text-red-600 w-full max-w-fit border text-nowrap border-red-600/10 rounded-full">
+                          ${item.priceMin} - ${item.priceMax}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="p-4 flex items-center justify-around bg-red-500/5 border rounded-lg rounded-t-none border-red-600/10">
+                  <div className="flex flex-col items-center justify-center flex-1">
+                    <p className="text-xs">Estimated Total Add-on</p>
+                    <h4 className="text-lg font-semibold">
+                      {result?.estimatedPrice.currency}
+                      {result?.estimatedPrice.min} -{" "}
+                      {result?.estimatedPrice.currency}
+                      {result?.estimatedPrice.max}
+                    </h4>
+                  </div>
+                  <Separator orientation="vertical" />
+                  <div className="flex flex-col items-center justify-center flex-1">
+                    <p className="text-xs">Timeline Extension</p>
+                    <h4 className="text-lg font-semibold">
+                      +{result?.timelineExtension}
+                    </h4>
+                  </div>
+                </div>
               </TabsContent>
             </Tabs>
           </CardContent>
