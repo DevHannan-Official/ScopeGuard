@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,8 +25,14 @@ import {
   Sparkles,
   XCircle,
 } from "lucide-react";
+import { analyzeScopeAction } from "../actions/analyze-scope";
+import { useState } from "react";
 
 const AppSection = () => {
+  const [values, setValues] = useState({
+    originalScope: "",
+    clientRequest: "",
+  });
   const listItems = [
     {
       title: "E-commerce section with checkout flow",
@@ -60,6 +66,15 @@ const AppSection = () => {
 
     return { totalFrom, totalTo };
   };
+
+  async function onSubmit(values: any) {
+    const result = await analyzeScopeAction(
+      values.originalScope,
+      values.clientRequest,
+    );
+
+    console.log(result);
+  }
   return (
     <div className="w-full min-h-96 p-4 flex items-start justify-center bg-muted gap-6">
       <Card className="w-full max-w-xl px-6">
@@ -75,6 +90,10 @@ const AppSection = () => {
               maxLength={3000}
               placeholder={`Design a 5-page website in Figma.\nIncludes: homepage, about, services, contact, blog.\n2 rounds of revisions included.\n\nTimeline: 3 weeks.`}
               className="min-h-46"
+              value={values.originalScope}
+              onChange={(e) =>
+                setValues({ ...values, originalScope: e.target.value })
+              }
             />
           </CardContent>
         </div>
@@ -90,10 +109,14 @@ const AppSection = () => {
               maxLength={3000}
               placeholder={`Hey, can you also add an e-commerce section with product listings and a checkout flow? Also, the CEO wants a team page and a careers page.\n\nLet me know if that works!`}
               className="min-h-46"
+              value={values.clientRequest}
+              onChange={(e) =>
+                setValues({ ...values, clientRequest: e.target.value })
+              }
             />
           </CardContent>
         </div>
-        <Button size={"xl"}>
+        <Button size={"xl"} type="button" onClick={() => onSubmit(values)}>
           <Sparkles /> Check Scope
         </Button>
         <CardDescription className="flex items-center gap-1.5 self-center text-center">
