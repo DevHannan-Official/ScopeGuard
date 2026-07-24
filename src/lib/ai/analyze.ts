@@ -3,10 +3,19 @@ import { buildAnalyzeScopePrompt } from "./prompts";
 import { AnalyzeScopeResponseSchema } from "./schemas";
 
 export async function analyzeScope(
+  userName: string,
+  clientName: string,
+  currency: string,
   originalScope: string,
   clientRequest: string,
 ) {
-  const prompt = buildAnalyzeScopePrompt(originalScope, clientRequest);
+  const prompt = buildAnalyzeScopePrompt(
+    userName,
+    clientName,
+    currency,
+    originalScope,
+    clientRequest,
+  );
 
   const response = await gemini.models.generateContent({
     model: "gemini-3.6-flash",

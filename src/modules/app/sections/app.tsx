@@ -13,21 +13,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import {
   ChartNoAxesCombined,
+  Check,
   ChevronDown,
   Copy,
-  FileText,
   Frame,
+  Info,
   List,
   LockKeyhole,
   Mail,
   ShieldCheck,
   Sparkles,
-  XCircle,
 } from "lucide-react";
 import { analyzeScopeAction } from "../actions/analyze-scope";
 import { Controller, useForm } from "react-hook-form";
 import { promptSchema, promptSchemaType } from "../lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+var cc = require("currency-codes/data");
+
 import {
   Field,
   FieldDescription,
@@ -37,55 +39,147 @@ import {
 } from "@/components/ui/field";
 import { useState } from "react";
 import { useScope } from "../stores/useScope";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { formatCompactNumber } from "@/lib/utils/formatters";
 
 const AppSection = () => {
   const form = useForm<promptSchemaType>({
     resolver: zodResolver(promptSchema),
     defaultValues: {
+      name: "",
+      client: "",
+      currency: "USD",
       originalScope: "",
       clientRequest: "",
     },
   });
   const { result, setResult } = useScope();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const listItems = [
-    {
-      title: "E-commerce section with checkout flow",
-      desc: "Not mentioned in scope. This is a significant feature.",
-      from: 800,
-      to: 2400,
-    },
-    {
-      title: "Team page",
-      desc: "Your scope covers 5 specific pages. This is page 6.",
-      from: 150,
-      to: 300,
-    },
-    {
-      title: "Careers page",
-      desc: "Your scope covers 5 specific pages. This is page 7.",
-      from: 150,
-      to: 300,
-    },
-  ];
+  const [copied, setCopied] = useState(false);
+
+  type CurrencyOption = {
+    code: string;
+    currency: string;
+  };
+
+  const currencies: CurrencyOption[] = cc;
 
   async function onSubmit(values: promptSchemaType) {
     setIsSubmitting(true);
     const result = await analyzeScopeAction(
+      values.name,
+      values.client,
+      values.currency,
       values.originalScope,
       values.clientRequest,
     );
     setResult(result);
 
     setIsSubmitting(false);
-
-    console.log(result);
   }
+
   return (
     <div className="w-full min-h-96 p-4 flex items-start justify-center bg-muted gap-6">
       <Card className="w-full max-w-xl px-6">
         <form id="form-scopes" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup></FieldGroup>
+          <FieldGroup className="grid grid-cols-2 mb-4">
+            <Controller
+              name="name"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-scopes-original-scope">
+                    Your Name
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    maxLength={3000}
+                    placeholder={"John Doe"}
+                    id="form-scopes-original-scope"
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="client"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-scopes-original-scope">
+                    Client
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    maxLength={3000}
+                    placeholder={"Client Name"}
+                    id="form-scopes-original-scope"
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="currency"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  data-invalid={fieldState.invalid}
+                  className="w-full col-span-2"
+                >
+                  <FieldLabel htmlFor="form-scopes-original-currency">
+                    Currency
+                  </FieldLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={field.disabled}
+                    name={field.name}
+                    inputRef={field.ref}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder="Select the Currency"
+                        className={"font-semibold"}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {currencies.map((currency, i) => (
+                          <SelectItem key={i} value={currency.code}>
+                            <span className="font-semibold">
+                              {currency.code}
+                            </span>{" "}
+                            {currency.currency}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
           <FieldGroup>
             <Controller
               name="originalScope"
@@ -171,7 +265,7 @@ const AppSection = () => {
               <TabsContent value={"result"} className={"py-4"}>
                 <div className="flex items-center justify-between">
                   <div className="py-2 px-3 bg-red-500/5 rounded-full border border-red-600/10 text-red-600 flex items-center gap-1.5 w-fit">
-                    <XCircle size={18} />{" "}
+                    <Info size={18} />{" "}
                     <span className="capitalize text-base font-medium">
                       {result?.verdict}
                     </span>
@@ -235,7 +329,10 @@ const AppSection = () => {
                           Est. Add-on
                         </span>
                         <div className="px-2 py-1.5 bg-red-500/5 text-red-600 w-full max-w-fit border text-nowrap border-red-600/10 rounded-full">
-                          ${item.priceMin} - ${item.priceMax}
+                          {result?.estimatedPrice.currency}
+                          {formatCompactNumber(item.priceMin)} -{" "}
+                          {result?.estimatedPrice.currency}
+                          {formatCompactNumber(item.priceMax)}
                         </div>
                       </div>
                     </div>
@@ -246,9 +343,9 @@ const AppSection = () => {
                     <p className="text-xs">Estimated Total Add-on</p>
                     <h4 className="text-lg font-semibold">
                       {result?.estimatedPrice.currency}
-                      {result?.estimatedPrice.min} -{" "}
+                      {formatCompactNumber(result?.estimatedPrice.min)} -{" "}
                       {result?.estimatedPrice.currency}
-                      {result?.estimatedPrice.max}
+                      {formatCompactNumber(result?.estimatedPrice.max)}
                     </h4>
                   </div>
                   <Separator orientation="vertical" />
@@ -276,11 +373,23 @@ const AppSection = () => {
                       variant={"outline"}
                       size={"lg"}
                       className={"w-full"}
-                      onClick={async (e) =>
-                        await navigator.clipboard.writeText(result?.email)
-                      }
+                      onClick={async (e) => {
+                        await navigator.clipboard.writeText(result?.email);
+                        setCopied(true);
+                        setTimeout(() => {
+                          setCopied(false);
+                        }, 1800);
+                      }}
                     >
-                      <Copy /> Copy Email
+                      {copied ? (
+                        <>
+                          <Check /> Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy /> Copy Email
+                        </>
+                      )}
                     </Button>
                     <ChevronDown size={16} />
                   </div>
@@ -294,18 +403,17 @@ const AppSection = () => {
               </TabsContent>
               <TabsContent value={"breakdown"} className={"py-4"}>
                 <CardTitle>Add-ons</CardTitle>
-                <div className="flex flex-col mt-2 gap-2">
+                <div className="flex flex-col mt-3 gap-2">
                   {result.items.map((item, i) => (
                     <div
                       key={i}
                       className={cn(
                         "py-4 px-6 flex items-center justify-between bg-background rounded-lg border",
-                        i + 1 === result.items.length &&
-                          "border-b-0 rounded-b-none",
+                        i > 0 && "border-t",
                       )}
                     >
                       <div className="flex items-center gap-6">
-                        <span className="size-10 rounded-lg font-semibold border text-center flex items-center justify-center">
+                        <span className="size-10 bg-background rounded-lg font-semibold border text-center flex items-center justify-center">
                           {i + 1}
                         </span>
                         <div>
@@ -322,20 +430,23 @@ const AppSection = () => {
                           Est. Add-on
                         </span>
                         <div className="px-2 py-1.5 bg-red-500/5 text-red-600 w-full max-w-fit border text-nowrap border-red-600/10 rounded-full">
-                          ${item.priceMin} - ${item.priceMax}
+                          {result?.estimatedPrice.currency}
+                          {formatCompactNumber(item.priceMin)} -{" "}
+                          {result?.estimatedPrice.currency}
+                          {formatCompactNumber(item.priceMax)}
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="p-4 flex items-center justify-around bg-red-500/5 border rounded-lg rounded-t-none border-red-600/10">
+                <div className="p-4 mt-6 flex items-center justify-around bg-red-500/5 border rounded-lg border-red-600/10">
                   <div className="flex flex-col items-center justify-center flex-1">
                     <p className="text-xs">Estimated Total Add-on</p>
                     <h4 className="text-lg font-semibold">
                       {result?.estimatedPrice.currency}
-                      {result?.estimatedPrice.min} -{" "}
+                      {formatCompactNumber(result?.estimatedPrice.min)} -{" "}
                       {result?.estimatedPrice.currency}
-                      {result?.estimatedPrice.max}
+                      {formatCompactNumber(result?.estimatedPrice.max)}
                     </h4>
                   </div>
                   <Separator orientation="vertical" />
