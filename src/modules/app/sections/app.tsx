@@ -192,8 +192,14 @@ const AppSection = () => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-scopes-original-scope">
+                  <FieldLabel
+                    htmlFor="form-scopes-original-scope"
+                    className="w-full flex items-center justify-between gap-1.5"
+                  >
                     1. Original Scope
+                    <span className="text-xs text-muted-foreground self-end text-end">
+                      {form.getValues("originalScope").trim().length}/3000
+                    </span>
                   </FieldLabel>
                   <Textarea
                     {...field}
@@ -218,8 +224,14 @@ const AppSection = () => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-scopes-client-request">
+                  <FieldLabel
+                    htmlFor="form-scopes-client-request"
+                    className="w-full flex items-center justify-between gap-1.5"
+                  >
                     2. Client's New Request
+                    <span className="text-xs text-muted-foreground self-end text-end">
+                      {form.getValues("clientRequest").trim().length}/3000
+                    </span>
                   </FieldLabel>
                   <Textarea
                     {...field}
