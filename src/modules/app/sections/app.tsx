@@ -87,7 +87,7 @@ const AppSection = () => {
   }
 
   return (
-    <div className="w-full min-h-96 p-4 flex items-start justify-center bg-muted gap-6">
+    <div className="w-full p-4 flex flex-col lg:flex-row items-center lg:items-start justify-center bg-muted gap-6">
       <Card className="w-full max-w-xl px-6">
         <form id="form-scopes" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup className="grid grid-cols-2 mb-4">
@@ -95,7 +95,10 @@ const AppSection = () => {
               name="name"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+                <Field
+                  data-invalid={fieldState.invalid}
+                  className="col-span-2 lg:col-span-1"
+                >
                   <FieldLabel htmlFor="form-scopes-original-scope">
                     Your Name
                   </FieldLabel>
@@ -117,7 +120,10 @@ const AppSection = () => {
               name="client"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+                <Field
+                  data-invalid={fieldState.invalid}
+                  className="col-span-2 lg:col-span-1"
+                >
                   <FieldLabel htmlFor="form-scopes-original-scope">
                     Client
                   </FieldLabel>
@@ -194,7 +200,7 @@ const AppSection = () => {
                     aria-invalid={fieldState.invalid}
                     maxLength={3000}
                     placeholder={`Design a 5-page website in Figma.\nIncludes: homepage, about, services, contact, blog.\n2 rounds of revisions included.\n\nTimeline: 3 weeks.`}
-                    className="min-h-46"
+                    className="min-h-46 text-xs sm:text-sm"
                     id="form-scopes-original-scope"
                   />
                   <FieldDescription>
@@ -220,7 +226,7 @@ const AppSection = () => {
                     aria-invalid={fieldState.invalid}
                     maxLength={3000}
                     placeholder={`Hey, can you also add an e-commerce section with product listings and a checkout flow? Also, the CEO wants a team page and a careers page.\n\nLet me know if that works!`}
-                    className="min-h-46"
+                    className="min-h-46 text-xs sm:text-sm"
                     id="form-scopes-client-request"
                   />
                   <FieldDescription>
@@ -263,10 +269,10 @@ const AppSection = () => {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value={"result"} className={"py-4"}>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
                   <div className="py-2 px-3 bg-red-500/5 rounded-full border border-red-600/10 text-red-600 flex items-center gap-1.5 w-fit">
                     <Info size={18} />{" "}
-                    <span className="capitalize text-base font-medium">
+                    <span className="capitalize text-sm lg:text-base font-medium">
                       {result?.verdict}
                     </span>
                   </div>
@@ -295,7 +301,7 @@ const AppSection = () => {
                     </div>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="text-xs text-muted-foreground mt-2 text-center sm:text-start">
                   {result?.verdict === "INSIDE_SCOPE"
                     ? `This request includes ${result?.items.length} additions that are covered in your original scope`
                     : result?.verdict === "NEEDS_DISCUSSION"
@@ -324,7 +330,7 @@ const AppSection = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-col sm:flex-row items-center gap-2">
                         <span className="text-xs text-muted-foreground text-nowrap w-full">
                           Est. Add-on
                         </span>
@@ -341,7 +347,7 @@ const AppSection = () => {
                 <div className="p-4 mt-6 flex items-center justify-around bg-red-500/5 border rounded-lg border-red-600/10">
                   <div className="flex flex-col items-center justify-center flex-1">
                     <p className="text-xs">Estimated Total Add-on</p>
-                    <h4 className="text-lg font-semibold">
+                    <h4 className="text-sm sm:text-base lg:text-lg font-semibold">
                       {result?.estimatedPrice.currency}
                       {formatCompactNumber(result?.estimatedPrice.min)} -{" "}
                       {result?.estimatedPrice.currency}
@@ -351,7 +357,7 @@ const AppSection = () => {
                   <Separator orientation="vertical" />
                   <div className="flex flex-col items-center justify-center flex-1">
                     <p className="text-xs">Timeline Extension</p>
-                    <h4 className="text-lg font-semibold">
+                    <h4 className="text-sm sm:text-base lg:text-lg font-semibold">
                       +{result?.timelineExtension}
                     </h4>
                   </div>
@@ -396,7 +402,7 @@ const AppSection = () => {
                 </div>
                 <Textarea
                   contentEditable={false}
-                  className="min-h-46 rounded-t-none border-t-0 px-6 py-4"
+                  className="min-h-46 rounded-t-none border-t-0 px-6 py-4 text-xs sm:text-sm"
                   placeholder="Generated mail/message..."
                   value={result?.email}
                 />
@@ -425,7 +431,7 @@ const AppSection = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-col sm:flex-row items-center gap-2">
                         <span className="text-xs text-muted-foreground text-nowrap w-full">
                           Est. Add-on
                         </span>
@@ -442,7 +448,7 @@ const AppSection = () => {
                 <div className="p-4 mt-6 flex items-center justify-around bg-red-500/5 border rounded-lg border-red-600/10">
                   <div className="flex flex-col items-center justify-center flex-1">
                     <p className="text-xs">Estimated Total Add-on</p>
-                    <h4 className="text-lg font-semibold">
+                    <h4 className="text-sm sm:text-base lg:text-lg font-semibold">
                       {result?.estimatedPrice.currency}
                       {formatCompactNumber(result?.estimatedPrice.min)} -{" "}
                       {result?.estimatedPrice.currency}
@@ -452,7 +458,7 @@ const AppSection = () => {
                   <Separator orientation="vertical" />
                   <div className="flex flex-col items-center justify-center flex-1">
                     <p className="text-xs">Timeline Extension</p>
-                    <h4 className="text-lg font-semibold">
+                    <h4 className="text-sm sm:text-base lg:text-lg font-semibold">
                       +{result?.timelineExtension}
                     </h4>
                   </div>

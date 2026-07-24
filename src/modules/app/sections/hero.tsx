@@ -5,16 +5,22 @@ import { Star } from "lucide-react";
 
 const HeroSection = () => {
   return (
-    <div className="w-full flex-col min-h-96 p-4 flex items-center justify-center bg-muted gap-4">
+    <div className="w-full flex-col p-4 flex items-center justify-center bg-muted gap-4">
       <Logo />
       <div className="flex items-center justify-between text-center flex-col mt-8">
-        <h2 className="text-4xl mb-3">Your client just asked for more.</h2>
-        <p>Paste your project scope and the new request.</p>
-        <p>Get an instant answer. Protect your time. Protect your income.</p>
+        <h2 className="text-3xl font-medium lg:text-4xl mb-3">
+          Your client just asked for more.
+        </h2>
+        <p className="text-xs lg:text-sm">
+          Paste your project scope and the new request.
+        </p>
+        <p className="text-xs lg:text-sm">
+          Get an instant answer. Protect your time. Protect your income.
+        </p>
       </div>
       <Badge
         variant={"outline"}
-        className="h-12 px-4 bg-background py-2 w-full max-w-fit flex items-center justify-between gap-8"
+        className="h-12 px-4 bg-background hidden py-2 w-full max-w-fit lg:flex items-center justify-between gap-8"
       >
         <div>
           <AvatarGroup>
