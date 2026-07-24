@@ -9,16 +9,24 @@ const Footer = () => {
       <div>
         <Logo />
         <div className="flex items-center gap-4 mt-2 sm:ml-4">
-          <Link href={"policy"} className="text-xs hover:underline">
+          <Link
+            href={"/documents/ScopeGuard_Privacy_Policy.pdf"}
+            download={"ScopeGuard_Privacy_Policy.pdf"}
+            className="text-xs hover:underline"
+          >
             Privacy Policy
           </Link>
-          <Link href={"terms"} className="text-xs hover:underline">
+          <Link
+            href={"/documents/ScopeGuard_Terms_and_Conditions.pdf"}
+            download={"ScopeGuard_Terms_and_Conditions.pdf"}
+            className="text-xs hover:underline"
+          >
             Terms & Conditions
           </Link>
         </div>
       </div>
       <p className="text-sm text-muted-foreground">
-        &copy; {new Date().getFullYear()} SnapGuard. All rights reserved.
+        &copy; {new Date().getFullYear()} ScopeGuard. All rights reserved.
       </p>
       <div className="flex items-center gap-3">
         <Link href={"malto:hannandeveloper1@gmail.com"}>
